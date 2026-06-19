@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Part 1: Java Fundamentals - Interactive MCQ Quiz</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #495057;
+            margin-top: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .quiz-content {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .question-card {
+            background: #ffffff;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .question-card.answered-correct {
+            border-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .question-card.answered-wrong {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .question-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .options {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: white;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        .option.selected {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .option.wrong {
+            background: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
+        .option.disabled {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .option-label {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            margin-right: 15px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .option.correct .option-label,
+        .option.wrong .option-label {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .feedback {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .feedback.wrong {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .result-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result-modal.show {
+            display: flex;
+        }
+
+        .result-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .result-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+
+        .result-score {
+            font-size: 48px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 20px 0;
+        }
+
+        .result-details {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .result-detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .quiz-content {
+                padding: 20px;
+            }
+
+            .question-text {
+                font-size: 16px;
+            }
+
+            .option {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Part 1: Java Fundamentals - Interactive MCQ Quiz</h1>
+            <p>Test your knowledge with 130 comprehensive questions</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-label">Progress</div>
+                <div class="stat-value" id="progressStat">0/130</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Correct</div>
+                <div class="stat-value" id="correctStat" style="color: #28a745;">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Wrong</div>
+                <div class="stat-value" id="wrongStat" style="color: #dc3545;">0</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">Score</div>
+                <div class="stat-value" id="scoreStat">0%</div>
+            </div>
+        </div>
+
+        <div class="quiz-content">
+            <div class="filter-buttons">
+                <button class="filter-btn active" onclick="filterQuestions('all')">All Questions</button>
+                <button class="filter-btn" onclick="filterQuestions('unanswered')">Unanswered</button>
+                <button class="filter-btn" onclick="filterQuestions('correct')">Correct</button>
+                <button class="filter-btn" onclick="filterQuestions('wrong')">Wrong</button>
+            </div>
+
+            <div id="questionsContainer"></div>
+        </div>
+
+        <div class="navigation">
+            <button class="btn btn-secondary" onclick="resetQuiz()">🔄 Reset Quiz</button>
+            <button class="btn btn-primary" onclick="showResults()">📊 Show Results</button>
+        </div>
+    </div>
+
+    <div class="result-modal" id="resultModal">
+        <div class="result-content">
+            <div class="result-icon" id="resultIcon">🎉</div>
+            <div class="result-title" id="resultTitle">Quiz Complete!</div>
+            <div class="result-score" id="resultScore">0%</div>
+            <div class="result-details">
+                <div class="result-detail-item">
+                    <span>Total Questions:</span>
+                    <strong>130</strong>
+                </div>
+                <div class="result-detail-item">
+                    <span>Answered:</span>
+                    <strong id="resultAnswered">0</strong>
+                </div>
+                <div class="result-detail-item">
+                    <span>Correct:</span>
+                    <strong style="color: #28a745;" id="resultCorrect">0</strong>
+                </div>
+                <div class="result-detail-item">
+                    <span>Wrong:</span>
+                    <strong style="color: #dc3545;" id="resultWrong">0</strong>
+                </div>
+                <div class="result-detail-item">
+                    <span>Performance:</span>
+                    <strong id="resultPerformance">-</strong>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="closeResults()">Continue Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            // Section A: Java Fundamentals (Q1-Q20)
+            { section: "Java Fundamentals", question: "What does JVM stand for?", options: ["Java Variable Machine", "Java Virtual Machine", "Java Version Manager", "Java Visual Machine"], answer: 1 },
+            { section: "Java Fundamentals", question: "Which component is required to develop Java applications?", options: ["JRE only", "JVM only", "JDK", "Any of the above"], answer: 2 },
+            { section: "Java Fundamentals", question: "What is the correct relationship between JDK, JRE, and JVM?", options: ["JVM = JRE + JDK", "JDK = JVM + Libraries", "JDK = JRE + Development Tools", "JRE = JDK + JVM"], answer: 2 },
+            { section: "Java Fundamentals", question: "What makes Java platform-independent?", options: ["It compiles to machine code", "It compiles to bytecode that runs on JVM", "It uses C++ libraries", "It requires specific operating system"], answer: 1 },
+            { section: "Java Fundamentals", question: "Which file extension is used for Java bytecode?", options: [".java", ".byte", ".class", ".jvm"], answer: 2 },
+            { section: "Java Fundamentals", question: "What does WORA stand for in Java?", options: ["Write Once, Run Always", "Write Once, Run Anywhere", "Write Object, Run Anywhere", "Write Once, Repeat Anywhere"], answer: 1 },
+            { section: "Java Fundamentals", question: "Which of the following is NOT a Java feature?", options: ["Platform Independent", "Object-Oriented", "Multiple Inheritance (using classes)", "Robust"], answer: 2 },
+            { section: "Java Fundamentals", question: "What does JIT compiler stand for?", options: ["Just In Time", "Java In Time", "Just Instant Time", "Java Instant Translation"], answer: 0 },
+            { section: "Java Fundamentals", question: "Which of the following is TRUE about Java?", options: ["Java supports pointers", "Java supports operator overloading", "Java supports multiple inheritance using classes", "Java has automatic garbage collection"], answer: 3 },
+            { section: "Java Fundamentals", question: "What is the entry point of a Java program?", options: ["start() method", "main() method", "run() method", "init() method"], answer: 1 },
+            { section: "Java Fundamentals", question: "Which keyword is used to define a class in Java?", options: ["define", "class", "struct", "object"], answer: 1 },
+            { section: "Java Fundamentals", question: "What is the correct signature of the main method?", options: ["public void main(String args[])", "public static void main(String[] args)", "static void main(String[] args)", "void main(String[] args)"], answer: 1 },
+            { section: "Java Fundamentals", question: "Which component of Java is platform-dependent?", options: ["Bytecode", "JVM", ".class file", "Source code"], answer: 1 },
+            { section: "Java Fundamentals", question: "What does 'javac' command do?", options: ["Executes Java program", "Compiles Java source code", "Debugs Java program", "Creates documentation"], answer: 1 },
+            { section: "Java Fundamentals", question: "Which of the following is a characteristic of Java being 'Robust'?", options: ["It supports pointers", "It has strong type checking", "It allows multiple inheritance", "It requires manual memory management"], answer: 1 },
+            { section: "Java Fundamentals", question: "What is the default behavior of Java for memory management?", options: ["Manual memory allocation and deallocation", "Automatic garbage collection", "Requires explicit delete statements", "No memory management"], answer: 1 },
+            { section: "Java Fundamentals", question: "Which of the following makes Java secure?", options: ["Presence of pointers", "No bytecode verification", "No explicit pointers", "Manual memory management"], answer: 2 },
+            { section: "Java Fundamentals", question: "What happens when you run a .class file?", options: ["JVM converts it to source code", "JVM executes the bytecode", "Compiler generates machine code", "Nothing happens"], answer: 1 },
+            { section: "Java Fundamentals", question: "Which Java feature allows multiple threads to execute simultaneously?", options: ["Distributed", "Multithreaded", "Object-Oriented", "Robust"], answer: 1 },
+            { section: "Java Fundamentals", question: "What is the file extension of a Java source file?", options: [".jav", ".class", ".java", ".src"], answer: 2 },
+
+            // Section B: Data Types and Variables (Q21-Q45)
+            { section: "Data Types and Variables", question: "How many primitive data types are there in Java?", options: ["6", "7", "8", "9"], answer: 2 },
+            { section: "Data Types and Variables", question: "What is the size of int data type in Java?", options: ["16 bits", "32 bits", "64 bits", "8 bits"], answer: 1 },
+            { section: "Data Types and Variables", question: "What is the range of byte data type?", options: ["-128 to 127", "0 to 255", "-256 to 255", "0 to 127"], answer: 0 },
+            { section: "Data Types and Variables", question: "Which suffix is used for long data type?", options: ["l or L", "f or F", "d or D", "No suffix needed"], answer: 0 },
+            { section: "Data Types and Variables", question: "What is the default value of boolean variable?", options: ["true", "false", "0", "null"], answer: 1 },
+            { section: "Data Types and Variables", question: "Which data type is used to store a single character?", options: ["String", "char", "byte", "Character"], answer: 1 },
+            { section: "Data Types and Variables", question: "What is the default value of local variables?", options: ["0", "null", "false", "No default value"], answer: 3 },
+            { section: "Data Types and Variables", question: "Where are instance variables stored?", options: ["Stack", "Heap", "Method Area", "Register"], answer: 1 },
+            { section: "Data Types and Variables", question: "Where are static variables stored?", options: ["Stack", "Heap", "Method Area", "Register"], answer: 2 },
+            { section: "Data Types and Variables", question: "What is the process of converting primitive to wrapper class called?", options: ["Boxing", "Autoboxing", "Casting", "Wrapping"], answer: 1 },
+            { section: "Data Types and Variables", question: "Which wrapper class is used for int primitive?", options: ["Int", "INTEGER", "Integer", "Integr"], answer: 2 },
+            { section: "Data Types and Variables", question: "What is the widening order for data types?", options: ["int → short → byte → long", "byte → short → int → long", "long → int → short → byte", "byte → int → short → long"], answer: 1 },
+            { section: "Data Types and Variables", question: "Which casting is done automatically by Java?", options: ["Narrowing", "Widening", "Both", "None"], answer: 1 },
+            { section: "Data Types and Variables", question: "What is the output of: int x = (int) 9.9;", options: ["9.9", "9", "10", "Compilation error"], answer: 1 },
+            { section: "Data Types and Variables", question: "Which keyword is used for static variables?", options: ["final", "static", "const", "shared"], answer: 1 },
+            { section: "Data Types and Variables", question: "How many copies of static variables exist?", options: ["One per object", "One per method", "One for entire class", "Depends on usage"], answer: 2 },
+            { section: "Data Types and Variables", question: "Which of the following can be null?", options: ["int", "Integer", "boolean", "char"], answer: 1 },
+            { section: "Data Types and Variables", question: "What does Integer.parseInt('100') return?", options: ["Integer object", "int primitive", "String", "Compilation error"], answer: 1 },
+            { section: "Data Types and Variables", question: "What is the default value of int instance variable?", options: ["null", "0", "-1", "No default value"], answer: 1 },
+            { section: "Data Types and Variables", question: "Which data type has the highest precision?", options: ["float", "double", "int", "long"], answer: 1 },
+            { section: "Data Types and Variables", question: "What is the size of char data type?", options: ["8 bits", "16 bits", "32 bits", "64 bits"], answer: 1 },
+            { section: "Data Types and Variables", question: "Can local variables have access modifiers?", options: ["Yes", "No", "Only public", "Only private"], answer: 1 },
+            { section: "Data Types and Variables", question: "What happens during unboxing?", options: ["Primitive to Wrapper", "Wrapper to Primitive", "String to int", "int to String"], answer: 1 },
+            { section: "Data Types and Variables", question: "Which is NOT a valid variable name?", options: ["_name", "$name", "2name", "name2"], answer: 2 },
+            { section: "Data Types and Variables", question: "What is the default value of String instance variable?", options: ["\"\"", "null", "\"null\"", "No default value"], answer: 1 },
+
+            // Section C: Operators (Q46-Q60)
+            { section: "Operators", question: "What is the output of: int x = 5; System.out.println(x++);", options: ["5", "6", "4", "Compilation error"], answer: 0 },
+            { section: "Operators", question: "What is the output of: int x = 5; System.out.println(++x);", options: ["5", "6", "4", "Compilation error"], answer: 1 },
+            { section: "Operators", question: "What does the % operator do?", options: ["Division", "Modulus (remainder)", "Percentage", "Multiplication"], answer: 1 },
+            { section: "Operators", question: "What is the output of: 10 / 3 in Java?", options: ["3.333", "3", "3.0", "4"], answer: 1 },
+            { section: "Operators", question: "Which operator is used for logical AND?", options: ["&", "&&", "|", "||"], answer: 1 },
+            { section: "Operators", question: "What is the ternary operator syntax?", options: ["condition ? true : false", "condition : true ? false", "true ? condition : false", "? condition : true false"], answer: 0 },
+            { section: "Operators", question: "What is the precedence of ++ operator?", options: ["Lowest", "Highest", "Medium", "Same as +"], answer: 1 },
+            { section: "Operators", question: "What does the ! operator do?", options: ["Factorial", "Logical NOT", "Not equal", "Bitwise NOT"], answer: 1 },
+            { section: "Operators", question: "What is the output of: 5 & 3 (bitwise AND)?", options: ["1", "3", "5", "7"], answer: 0 },
+            { section: "Operators", question: "Which operator has the highest precedence?", options: ["+", "*", "++", "="], answer: 2 },
+            { section: "Operators", question: "What is the output of: int x = 10; x += 5;", options: ["10", "5", "15", "50"], answer: 2 },
+            { section: "Operators", question: "What does the << operator do?", options: ["Right shift", "Left shift", "Less than comparison", "Assignment"], answer: 1 },
+            { section: "Operators", question: "What is the output of: true && false?", options: ["true", "false", "1", "0"], answer: 1 },
+            { section: "Operators", question: "What is the output of: true || false?", options: ["true", "false", "1", "0"], answer: 0 },
+            { section: "Operators", question: "What is the difference between & and &&?", options: ["No difference", "&& is short-circuit, & is not", "& is logical, && is bitwise", "&& is faster"], answer: 1 },
+
+            // Section D: Control Flow (Q61-Q80)
+            { section: "Control Flow", question: "Which of these is NOT a valid loop in Java?", options: ["for", "while", "do-while", "repeat-until"], answer: 3 },
+            { section: "Control Flow", question: "What is the minimum number of times a do-while loop executes?", options: ["0", "1", "2", "Depends on condition"], answer: 1 },
+            { section: "Control Flow", question: "Which statement is used to exit a loop?", options: ["exit", "break", "stop", "end"], answer: 1 },
+            { section: "Control Flow", question: "Which statement skips the current iteration of a loop?", options: ["skip", "continue", "break", "next"], answer: 1 },
+            { section: "Control Flow", question: "Which data types work with switch statement?", options: ["int, String, long", "int, char, String", "float, double, int", "All data types"], answer: 1 },
+            { section: "Control Flow", question: "What happens if break is missing in switch case?", options: ["Compilation error", "Fall-through to next case", "Loop continues", "Nothing happens"], answer: 1 },
+            { section: "Control Flow", question: "Which loop is entry-controlled?", options: ["do-while", "while", "Both", "None"], answer: 1 },
+            { section: "Control Flow", question: "Which loop is exit-controlled?", options: ["for", "while", "do-while", "All of them"], answer: 2 },
+            { section: "Control Flow", question: "What is the syntax for enhanced for loop?", options: ["for(int i : array)", "for(i in array)", "foreach(int i : array)", "for(array : i)"], answer: 0 },
+            { section: "Control Flow", question: "Can you modify array elements in enhanced for loop?", options: ["Yes, always", "No, never", "Only for primitives", "Only for objects"], answer: 1 },
+            { section: "Control Flow", question: "What is the output of: for(;;) { break; }", options: ["Infinite loop", "Exits immediately", "Compilation error", "Runtime error"], answer: 1 },
+            { section: "Control Flow", question: "Which is true about labeled loops?", options: ["Can break outer loop from inner loop", "Not allowed in Java", "Only for for loops", "Deprecated"], answer: 0 },
+            { section: "Control Flow", question: "What is the default case in switch?", options: ["Mandatory", "Optional", "First case", "Last case"], answer: 1 },
+            { section: "Control Flow", question: "Can switch work with long data type?", options: ["Yes", "No", "Only in Java 7+", "Only in Java 8+"], answer: 1 },
+            { section: "Control Flow", question: "What is the condition check time for while loop?", options: ["Before execution", "After execution", "During execution", "No check"], answer: 0 },
+            { section: "Control Flow", question: "What is the output if condition is false in do-while?", options: ["Loop doesn't execute", "Loop executes once", "Compilation error", "Runtime error"], answer: 1 },
+            { section: "Control Flow", question: "Can you have nested if-else statements?", options: ["Yes", "No", "Only 2 levels", "Only with switch"], answer: 0 },
+            { section: "Control Flow", question: "What is the alternative to if-else for single condition?", options: ["switch", "Ternary operator", "while loop", "do-while"], answer: 1 },
+            { section: "Control Flow", question: "Can you access loop index in enhanced for loop?", options: ["Yes", "No", "Only in Java 8+", "Only with ArrayList"], answer: 1 },
+            { section: "Control Flow", question: "What happens with continue in nested loop?", options: ["Exits all loops", "Skips current iteration of inner loop", "Exits outer loop", "Compilation error"], answer: 1 },
+
+            // Section E: Arrays (Q81-Q100)
+            { section: "Arrays", question: "What is the index of the first element in an array?", options: ["1", "0", "-1", "Depends on declaration"], answer: 1 },
+            { section: "Arrays", question: "How do you get the length of an array?", options: ["array.length()", "array.length", "array.size()", "length(array)"], answer: 1 },
+            { section: "Arrays", question: "Can array size be changed after creation?", options: ["Yes", "No", "Only if dynamic", "Only with ArrayList"], answer: 1 },
+            { section: "Arrays", question: "What is the default value of int array elements?", options: ["null", "0", "-1", "No default value"], answer: 1 },
+            { section: "Arrays", question: "How do you declare a 2D array?", options: ["int array[][];", "int[][] array;", "Both A and B", "int[2D] array;"], answer: 2 },
+            { section: "Arrays", question: "What is a jagged array?", options: ["Array with same column sizes", "Array with different column sizes", "3D array", "Array of primitives"], answer: 1 },
+            { section: "Arrays", question: "Which method sorts an array?", options: ["Arrays.sort()", "array.sort()", "sort(array)", "Array.sort()"], answer: 0 },
+            { section: "Arrays", question: "Which method prints an array?", options: ["Arrays.print()", "Arrays.toString()", "array.toString()", "print(array)"], answer: 1 },
+            { section: "Arrays", question: "Can arrays store different data types?", options: ["Yes", "No", "Only with Object array", "Only in Java 8+"], answer: 2 },
+            { section: "Arrays", question: "What happens when you access array out of bounds?", options: ["Compilation error", "ArrayIndexOutOfBoundsException", "Returns null", "Returns 0"], answer: 1 },
+            { section: "Arrays", question: "How do you copy an array?", options: ["Arrays.copy()", "Arrays.copyOf()", "array.copy()", "copy(array)"], answer: 1 },
+            { section: "Arrays", question: "What is the syntax for array initialization?", options: ["int[] arr = {1,2,3};", "int[] arr = [1,2,3];", "int[] arr = new {1,2,3};", "int[] arr = array(1,2,3);"], answer: 0 },
+            { section: "Arrays", question: "Can you have an array of arrays?", options: ["No", "Yes, called multi-dimensional array", "Only 2D", "Not in Java"], answer: 1 },
+            { section: "Arrays", question: "What does Arrays.binarySearch() require?", options: ["Unsorted array", "Sorted array", "ArrayList", "String array"], answer: 1 },
+            { section: "Arrays", question: "What is the difference between Array and ArrayList?", options: ["No difference", "Array is fixed size, ArrayList is dynamic", "Array is slower", "ArrayList doesn't store objects"], answer: 1 },
+            { section: "Arrays", question: "Can arrays be passed to methods?", options: ["Yes", "No", "Only 1D arrays", "Only with copy"], answer: 0 },
+            { section: "Arrays", question: "What is array.length for 2D array?", options: ["Total elements", "Number of rows", "Number of columns", "Compilation error"], answer: 1 },
+            { section: "Arrays", question: "Can you use enhanced for loop with arrays?", options: ["Yes", "No", "Only 1D arrays", "Only in Java 8+"], answer: 0 },
+            { section: "Arrays", question: "What is the default value of String array elements?", options: ["\"\"", "null", "\"null\"", "No default value"], answer: 1 },
+            { section: "Arrays", question: "Which is faster: Array or ArrayList?", options: ["ArrayList", "Array", "Same speed", "Depends on operation"], answer: 1 },
+
+            // Section F: Strings (Q101-Q130)
+            { section: "Strings", question: "Is String a primitive data type?", options: ["Yes", "No", "Sometimes", "Depends on usage"], answer: 1 },
+            { section: "Strings", question: "Are Strings immutable in Java?", options: ["Yes", "No", "Only literals", "Only with new keyword"], answer: 0 },
+            { section: "Strings", question: "Where is String Pool located?", options: ["Stack", "Heap", "Method Area", "Register"], answer: 1 },
+            { section: "Strings", question: "What is the output of: \"Hello\" == \"Hello\"?", options: ["true", "false", "Compilation error", "Runtime error"], answer: 0 },
+            { section: "Strings", question: "What is the output of: new String(\"Hello\") == new String(\"Hello\")?", options: ["true", "false", "Compilation error", "Runtime error"], answer: 1 },
+            { section: "Strings", question: "Which method compares string content?", options: ["==", "equals()", "compare()", "compareTo()"], answer: 1 },
+            { section: "Strings", question: "What does String.length() return?", options: ["Size in bytes", "Number of characters", "Number of words", "Memory address"], answer: 1 },
+            { section: "Strings", question: "What is the output of: \"Hello\".charAt(0)?", options: ["H", "e", "0", "Compilation error"], answer: 0 },
+            { section: "Strings", question: "What does substring(2, 5) do?", options: ["Returns characters from index 2 to 5", "Returns characters from index 2 to 4", "Returns 3 characters starting from index 2", "Returns characters from index 2 to end"], answer: 1 },
+            { section: "Strings", question: "Which is faster for concatenation?", options: ["String", "StringBuilder", "StringBuffer", "All same speed"], answer: 1 },
+            { section: "Strings", question: "Is StringBuilder thread-safe?", options: ["Yes", "No", "Sometimes", "Depends on usage"], answer: 1 },
+            { section: "Strings", question: "Is StringBuffer thread-safe?", options: ["Yes", "No", "Sometimes", "Depends on usage"], answer: 0 },
+            { section: "Strings", question: "What is the default capacity of StringBuilder?", options: ["10", "16", "32", "64"], answer: 1 },
+            { section: "Strings", question: "What does trim() method do?", options: ["Removes all spaces", "Removes leading and trailing spaces", "Removes middle spaces", "Converts to lowercase"], answer: 1 },
+            { section: "Strings", question: "What is the output of: \"hello\".toUpperCase()?", options: ["hello", "HELLO", "Hello", "Compilation error"], answer: 1 },
+            { section: "Strings", question: "What does indexOf('o') return if 'o' is not found?", options: ["0", "-1", "null", "Exception"], answer: 1 },
+            { section: "Strings", question: "What does split(\" \") do?", options: ["Splits string into characters", "Splits string into words", "Removes spaces", "Compilation error"], answer: 1 },
+            { section: "Strings", question: "What does concat() method do?", options: ["Adds strings", "Same as +", "Creates new string", "All of the above"], answer: 3 },
+            { section: "Strings", question: "Can you modify a String after creation?", options: ["Yes", "No, creates new string", "Only with concat", "Only with replace"], answer: 1 },
+            { section: "Strings", question: "What is the output of: \"Java\".replace('a', 'o')?", options: ["Jovo", "Jova", "Java", "Compilation error"], answer: 0 },
+            { section: "Strings", question: "What does isEmpty() check?", options: ["If string is null", "If length is 0", "If string has spaces", "If string has characters"], answer: 1 },
+            { section: "Strings", question: "What does startsWith(\"He\") check?", options: ["If string ends with \"He\"", "If string starts with \"He\"", "If string contains \"He\"", "If string equals \"He\""], answer: 1 },
+            { section: "Strings", question: "What is the output of: \"Hello\".compareTo(\"Hello\")?", options: ["true", "false", "0", "1"], answer: 2 },
+            { section: "Strings", question: "What does intern() method do?", options: ["Moves string to heap", "Moves string to String Pool", "Removes string from pool", "Creates new string"], answer: 1 },
+            { section: "Strings", question: "When should you use StringBuilder?", options: ["Multi-threaded environment", "Single-threaded environment", "For constant strings", "Never"], answer: 1 },
+            { section: "Strings", question: "When should you use StringBuffer?", options: ["Single-threaded environment", "Multi-threaded environment", "For constant strings", "Never"], answer: 1 },
+            { section: "Strings", question: "What happens when StringBuilder capacity is exceeded?", options: ["Exception", "Automatically increases: (old * 2) + 2", "Truncates string", "Compilation error"], answer: 1 },
+            { section: "Strings", question: "What does equalsIgnoreCase() do?", options: ["Compares strings case-sensitively", "Compares strings ignoring case", "Converts to same case", "Checks if string has uppercase"], answer: 1 },
+            { section: "Strings", question: "Why is String immutable?", options: ["Security", "Thread safety", "String Pool efficiency", "All of the above"], answer: 3 },
+            { section: "Strings", question: "What is the output of: \"Hello\" + \"World\"?", options: ["HelloWorld", "Hello World", "Hello+World", "Compilation error"], answer: 0 }
+        ];
+
+        let userAnswers = new Array(quizData.length).fill(null);
+        let currentFilter = 'all';
+
+        function renderQuestions() {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            
+            let currentSection = '';
+            quizData.forEach((q, index) => {
+                // Filter logic
+                if (currentFilter === 'unanswered' && userAnswers[index] !== null) return;
+                if (currentFilter === 'correct' && (userAnswers[index] === null || userAnswers[index] !== q.answer)) return;
+                if (currentFilter === 'wrong' && (userAnswers[index] === null || userAnswers[index] === q.answer)) return;
+
+                // Section header
+                if (q.section !== currentSection) {
+                    currentSection = q.section;
+                    const sectionDiv = document.createElement('div');
+                    sectionDiv.className = 'section-title';
+                    sectionDiv.textContent = '📚 ' + currentSection;
+                    container.appendChild(sectionDiv);
+                }
+
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-card';
+                
+                if (userAnswers[index] !== null) {
+                    questionDiv.className += userAnswers[index] === q.answer ? ' answered-correct' : ' answered-wrong';
+                }
+
+                const questionNumber = document.createElement('div');
+                questionNumber.className = 'question-number';
+                questionNumber.textContent = `Question ${index + 1}`;
+                
+                const questionText = document.createElement('div');
+                questionText.className = 'question-text';
+                questionText.textContent = q.question;
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'options';
+
+                q.options.forEach((option, optIndex) => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option';
+                    
+                    if (userAnswers[index] !== null) {
+                        optionDiv.classList.add('disabled');
+                        if (optIndex === q.answer) {
+                            optionDiv.classList.add('correct');
+                        } else if (optIndex === userAnswers[index]) {
+                            optionDiv.classList.add('wrong');
+                        }
+                    }
+
+                    const label = document.createElement('span');
+                    label.className = 'option-label';
+                    label.textContent = String.fromCharCode(65 + optIndex);
+
+                    const text = document.createElement('span');
+                    text.textContent = option;
+
+                    optionDiv.appendChild(label);
+                    optionDiv.appendChild(text);
+                    
+                    optionDiv.onclick = () => selectAnswer(index, optIndex);
+                    optionsDiv.appendChild(optionDiv);
+                });
+
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                feedback.id = `feedback-${index}`;
+
+                questionDiv.appendChild(questionNumber);
+                questionDiv.appendChild(questionText);
+                questionDiv.appendChild(optionsDiv);
+                questionDiv.appendChild(feedback);
+                container.appendChild(questionDiv);
+            });
+        }
+
+        function selectAnswer(qIndex, optIndex) {
+            if (userAnswers[qIndex] !== null) return;
+
+            userAnswers[qIndex] = optIndex;
+            const isCorrect = optIndex === quizData[qIndex].answer;
+
+            // Update UI
+            const card = document.querySelectorAll('.question-card')[getVisibleQuestionIndex(qIndex)];
+            card.className = 'question-card ' + (isCorrect ? 'answered-correct' : 'answered-wrong');
+
+            const options = card.querySelectorAll('.option');
+            options.forEach((opt, idx) => {
+                opt.classList.add('disabled');
+                if (idx === quizData[qIndex].answer) {
+                    opt.classList.add('correct');
+                } else if (idx === optIndex) {
+                    opt.classList.add('wrong');
+                }
+            });
+
+            // Show feedback
+            const feedback = card.querySelector('.feedback');
+            feedback.className = 'feedback show ' + (isCorrect ? 'correct' : 'wrong');
+            feedback.textContent = isCorrect ? 
+                '✅ Correct! Well done!' : 
+                `❌ Wrong! The correct answer is: ${String.fromCharCode(65 + quizData[qIndex].answer)}) ${quizData[qIndex].options[quizData[qIndex].answer]}`;
+
+            updateStats();
+        }
+
+        function getVisibleQuestionIndex(actualIndex) {
+            let visibleIndex = 0;
+            for (let i = 0; i <= actualIndex; i++) {
+                if (currentFilter === 'all') {
+                    if (i === actualIndex) return visibleIndex;
+                    visibleIndex++;
+                } else if (currentFilter === 'unanswered' && userAnswers[i] === null) {
+                    if (i === actualIndex) return visibleIndex;
+                    visibleIndex++;
+                } else if (currentFilter === 'correct' && userAnswers[i] !== null && userAnswers[i] === quizData[i].answer) {
+                    if (i === actualIndex) return visibleIndex;
+                    visibleIndex++;
+                } else if (currentFilter === 'wrong' && userAnswers[i] !== null && userAnswers[i] !== quizData[i].answer) {
+                    if (i === actualIndex) return visibleIndex;
+                    visibleIndex++;
+                }
+            }
+            return visibleIndex;
+        }
+
+        function updateStats() {
+            const answered = userAnswers.filter(a => a !== null).length;
+            const correct = userAnswers.filter((a, i) => a === quizData[i].answer).length;
+            const wrong = answered - correct;
+            const percentage = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+            const progress = (answered / quizData.length) * 100;
+
+            document.getElementById('progressStat').textContent = `${answered}/${quizData.length}`;
+            document.getElementById('correctStat').textContent = correct;
+            document.getElementById('wrongStat').textContent = wrong;
+            document.getElementById('scoreStat').textContent = percentage + '%';
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function filterQuestions(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            renderQuestions();
+        }
+
+        function resetQuiz() {
+            if (confirm('Are you sure you want to reset the quiz? All progress will be lost.')) {
+                userAnswers = new Array(quizData.length).fill(null);
+                currentFilter = 'all';
+                document.querySelectorAll('.filter-btn')[0].classList.add('active');
+                document.querySelectorAll('.filter-btn').forEach((btn, i) => {
+                    if (i > 0) btn.classList.remove('active');
+                });
+                renderQuestions();
+                updateStats();
+            }
+        }
+
+        function showResults() {
+            const answered = userAnswers.filter(a => a !== null).length;
+            const correct = userAnswers.filter((a, i) => a === quizData[i].answer).length;
+            const wrong = answered - correct;
+            const percentage = answered > 0 ? Math.round((correct / answered) * 100) : 0;
+
+            let performance = '';
+            let icon = '';
+            if (percentage >= 85) {
+                performance = 'Excellent! 🌟';
+                icon = '🎉';
+            } else if (percentage >= 70) {
+                performance = 'Very Good! 👍';
+                icon = '😊';
+            } else if (percentage >= 54) {
+                performance = 'Good! 👌';
+                icon = '🙂';
+            } else {
+                performance = 'Need More Practice 📚';
+                icon = '😐';
+            }
+
+            document.getElementById('resultIcon').textContent = icon;
+            document.getElementById('resultScore').textContent = percentage + '%';
+            document.getElementById('resultAnswered').textContent = answered;
+            document.getElementById('resultCorrect').textContent = correct;
+            document.getElementById('resultWrong').textContent = wrong;
+            document.getElementById('resultPerformance').textContent = performance;
+            document.getElementById('resultModal').classList.add('show');
+        }
+
+        function closeResults() {
+            document.getElementById('resultModal').classList.remove('show');
+        }
+
+        // Initialize
+        renderQuestions();
+        updateStats();
+    </script>
+</body>
+</html>
